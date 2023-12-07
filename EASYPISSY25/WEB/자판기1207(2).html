@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>🥤KC's 음료수 자판기🥤</title>
+    <style>
+        /* 간단한 스타일링 추가 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .drink {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        #changeDisplay {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🥤KC's 음료수 자판기🥤</h1>
+    <label for="moneyInput">🪙Insert COIN🪙:</label>
+    <input type="number" id="moneyInput" placeholder="돈을 입력하세요">
+    <button onclick="displayOptions()">확인</button>
+
+    <div class="options" id="drinkOptions">
+        <!-- 음료 옵션은 여기에 표시됩니다 -->
+    </div>
+
+    <div id="changeDisplay"></div>
+
+    <script>
+        const drinks = {
+            '2%': 1300,
+            '삼다수': 900,
+            '제로콜라': 1500,
+            '나랑드': 1100,
+            '데미소다': 1000,
+            '환타': 1200
+        };
+
+        let totalMoney = 0; // 전체 금액을 저장할 변수
+
+        function displayOptions() {
+            const money = parseInt(document.getElementById('moneyInput').value);
+            const drinkContainer = document.getElementById('drinkOptions');
+            drinkContainer.innerHTML = '';
+
+            for (const [drink, price] of Object.entries(drinks)) {
+                if (price <= money) {
+                    const drinkButton = document.createElement('button');
+                    drinkButton.classList.add('drink');
+                    drinkButton.textContent = `${drink}: ${price}원`;
+
+                    drinkButton.addEventListener('click', function() {
+                        selectAndDispenseDrink(drink, price);
+                    });
+
+                    drinkContainer.appendChild(drinkButton);
+                }
+            }
+        }
+
+        function selectAndDispenseDrink(selectedDrink, price) {
+            const money = parseInt(document.getElementById('moneyInput').value);
+            console.log(`선택한 음료: ${selectedDrink}`);
+            console.log(`넣은 돈: ${money}`);
+            const change = money - price;
+            console.log(`잔액: ${change}`);
+
+            const changeDisplay = document.getElementById('changeDisplay');
+            changeDisplay.innerHTML = `🥤선택한 음료: ${selectedDrink}<br>🪙남은 잔액: ${change}원`;
+
+            askForMore(change);
+        }
+
+        function askForMore(change) {
+            const result = confirm(`남은 잔액으로 음료를 한 번 더 선택하시겠습니까?`);
+            
+            if (result) {
+                totalMoney += parseInt(document.getElementById('moneyInput').value); // 이전 금액을 저장
+                displayOptions();
+            } else {
+                const changeDisplay = document.getElementById('changeDisplay');
+                const remaining = totalMoney + parseInt(document.getElementById('moneyInput').value); // 이전 금액을 포함한 전체 금액 계산
+                changeDisplay.innerHTML = `현재 금액: 전체 금액<br>전체 금액: ${remaining}원`; // 전체 금액 표시
+            }
+        }
+
+        document.getElementById('moneyInput').addEventListener('input', displayOptions);
+
+        function askForMore(change) {
+            const result = confirm(`남은 잔액으로 음료를 한 번 더 선택하시겠습니까?`);
+            
+            if (result) {
+                totalMoney += parseInt(document.getElementById('moneyInput').value); // 이전 금액을 저장
+                displayOptions();
+            } else {
+                const changeDisplay = document.getElementById('changeDisplay');
+                const remaining = totalMoney + parseInt(document.getElementById('moneyInput').value); // 이전 금액을 포함한 전체 금액 계산
+                changeDisplay.innerHTML = `현재 금액: 전체 금액<br>전체 금액: ${remaining}원`; // 전체 금액 표시
+                
+                // 새로운 음료 선택 버튼 추가
+                const newButton = document.createElement('button');
+                newButton.textContent = "새로운 음료 선택";
+                newButton.onclick = displayOptions; // 클릭 시 음료 선택 옵션 표시
+                changeDisplay.appendChild(newButton);
+            }
+        }
+    </script>
+</body>
+</html>

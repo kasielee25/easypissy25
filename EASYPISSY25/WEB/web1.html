@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vending Machine</title>
+</head>
+<body>
+
+<script>
+    class VendingMachine {
+        constructor() {
+            // 음료수 목록 및 가격 설정
+            this.drinks = {'2%': 1300, '삼다수': 900, '제로콜라': 1500, '나랑드': 1100, '데미소다': 1000, '환타': 1200};
+        }
+
+        displayOptions(availableDrinks = null) {
+            console.log("======음료수 목록=========");
+            const drinksToDisplay = availableDrinks || this.drinks;
+            for (const [drink, price] of Object.entries(drinksToDisplay)) {
+                console.log(`*${drink}: ${price}원`);
+            }
+        }
+
+        selectDrink(money) {
+            // 가장 저렴한 음료수의 가격 확인
+            const minPrice = Math.min(...Object.values(this.drinks));
+
+            // 돈이 가장 저렴한 음료수의 가격보다 작은지 확인
+            if (money < minPrice) {
+                console.log("돈이 부족합니다. 더 많은 돈을 넣어주세요.");
+                return;
+            }
+
+            let remainingChange = money;  // 남은 거스름돈 초기화
+
+            while (remainingChange >= minPrice) {
+                // 선택 가능한 음료수 목록 구하기
+                const availableDrinks = Object.fromEntries(
+                    Object.entries(this.drinks).filter(([_, price]) => price <= remainingChange)
+                );
+
+                // 음료수 목록 표시
+                this.displayOptions(availableDrinks);
+
+                // 사용자로부터 음료수 선택
+                const selectedDrink = prompt("뽑을 음료수를 선택하세요:");
+
+                // 선택한 음료수가 유효한지 확인
+                if (selectedDrink in availableDrinks) {
+                    // 음료수 제공
+                    console.log(`${selectedDrink}이(가) 나왔습니다. Enjoy!\n`);
+
+                    // 거스름돈 계산
+                    remainingChange -= this.drinks[selectedDrink];
+                    if (remainingChange > 0) {
+                        console.log(`▶ 남은 거스름돈 <${remainingChange}>원으로 더 뽑을 수 있습니다.`);
+                    }
+
+                    // 사용자에게 추가적인 선택 여부 묻기
+                    const continueChoice = prompt("더 음료수를 뽑으시겠습니까? (y/n): ");
+                    if (continueChoice.toLowerCase() !== 'y') {
+                        console.log("자판기 프로그램을 종료합니다.");
+                        break;
+                    }
+                } else {
+                    console.log("올바르지 않은 음료수 선택입니다.");
+                }
+            }
+
+            if (remainingChange < minPrice) {  // 남은 거스름돈이 선택 가능한 음료수의 가격보다 작은 경우
+                console.log("돈이 부족합니다!!!!!!!!");
+            }
+        }
+    }
+
+    // VendingMachine 인스턴스 생성
+    const vendingMachine = new VendingMachine();
+
+    // 무한 루프
+    while (true) {
+        // 사용자로부터 돈 입력 받기
+        const moneyInput = prompt("돈을 넣어주세요 (종료하려면 0 입력): ");
+
+        // 종료 조건 확인
+        if (moneyInput === '0') {
+            console.log("자판기 프로그램을 종료합니다.");
+            break;
+        }
+
+        // 입력값이 숫자인지 확인
+        if (!/^\d+$/.test(moneyInput)) {
+            console.log("올바른 숫자를 입력해주세요.");
+            continue;
+        }
+
+        // 입력값을 정수로 변환
+        const money = parseInt(moneyInput);
+
+        // 음료수 선택
+        vendingMachine.selectDrink(money);
+    }
+</script>
+
+</body>
+</html>
